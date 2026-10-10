@@ -1,11 +1,37 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
+    "name": "ic-memo",
+    "title": "Investment committee memo (draft)",
+    "for_each": "select d.id, d.name from deals d where d.stage in ('diligence','ic','term sheet')",
     "file": "name",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      { "title": "The deal", "sql": "select d.name as deal, o.name as company, o.country, d.stage, d.currency, d.round_size, d.our_cheque, d.pre_money, d.owner from deals d join orgs o on o.id = d.org_id where d.id = $1" },
+      { "title": "How we met them", "sql": "select coalesce(p.full_name, d.source_note, 'not recorded') as source from deals d left join people p on p.id = d.source_person_id where d.id = $1" },
+      { "title": "Every touch", "sql": "select t.happened_on as date, t.kind, p.full_name as person, t.summary, t.actor as by from touches t left join people p on p.id = t.person_id join deals d on d.id = $1 where t.deal_id = d.id or t.org_id = d.org_id or p.org_id = d.org_id order by t.happened_on desc" },
+      { "title": "Confidentiality", "sql": "select n.status, n.signed_on, n.expires_on, n.state from v_ndas n join deals d on d.org_id = n.org_id where d.id = $1" },
+      { "title": "Committee record", "sql": "select met_on, decision, amount, currency, conditions, present from ic_decisions where deal_id = $1 order by met_on" },
+      { "title": "Record checks", "sql": "select c.rule, c.finding from v_compliance c join deals d on d.name = c.item where d.id = $1" }
+    ]
+  },
+  {
+    "name": "investor-statement",
+    "title": "Investor commitment statement",
+    "for_each": "select c.id, o.name || ' ' || c.fund as name from commitments c join orgs o on o.id = c.investor_id where c.status in ('soft','committed')",
+    "file": "name",
+    "sections": [
+      { "title": "Commitment", "sql": "select o.name as investor, c.fund, c.status, c.currency, c.amount from commitments c join orgs o on o.id = c.investor_id where c.id = $1" },
+      { "title": "Investor certificate", "sql": "select certificate, certificate_on as signed_on, relied_on_until, certificate_state from v_certificates where id = $1" }
+    ]
+  },
+  {
+    "name": "portfolio-report",
+    "title": "Portfolio company report",
+    "for_each": "select id, name from orgs where kind = 'portfolio' and active",
+    "file": "name",
+    "sections": [
+      { "title": "Our investment", "sql": "select d.name as deal, d.currency, d.our_cheque, d.pre_money, d.stage_since as closed_on from deals d where d.org_id = $1 and d.stage = 'closed'" },
+      { "title": "Figures received", "sql": "select period, metric, value, unit, received_on from kpis where org_id = $1 order by period desc, metric" },
+      { "title": "Reporting", "sql": "select last_received, next_due, reporting from v_portfolio where id = $1" }
     ]
   }
 ]

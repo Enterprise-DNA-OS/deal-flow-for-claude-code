@@ -40,11 +40,26 @@
 
 Deal Flow for Claude Code does the job you pay Affinity for, as a Postgres database and a set of agent commands. There is no web front end. You open the folder in [Claude Code](https://claude.com/claude-code) (or Codex, OpenCode, Cursor: see `AGENTS.md`) and ask for what you want in plain language. It runs the right query, and it can answer questions the Affinity dashboard cannot.
 
-<!-- TODO(author): the annual bill. One sentence: what a 10 to 50 person business typically pays Affinity per year, all in, with a source. -->
+Affinity's own pricing page lists its Advanced plan at $2,700 per user per year, billed annually, so a ten-person deal team pays $27,000 a year before add-ons ([Affinity pricing](https://www.affinity.co/pricing), checked 10 October 2026; the page does not name the currency). Every partner, associate and analyst who needs to see the pipeline is another seat.
 
 Want the same thing with a web front end, or built on a different stack? That is a customisation, and it is exactly what Enterprise DNA does: [book a call](https://enterprisedna.co/omni/book/?utm_source=github&utm_medium=readme&utm_campaign=affinity).
 
-<!-- TODO(author): two or three sentences on what this specific product covers and who it is for. -->
+It is for venture and private equity funds, angel networks, family offices, corporate finance boutiques and business brokers in New Zealand and Australia. It holds the companies you track, the people you know there, every deal and its stage, every meeting and introduction, NDAs, investment committee decisions, the figures portfolio companies send you, and who has committed to your fund. On top of that sit the jobs a deal team does every week: the Monday pipeline meeting, chasing deals that have gone quiet, finding a warm introduction, preparing committee, chasing portfolio reporting and keeping investor certificates current.
+
+### Ten questions this answers today
+
+1. Which open deals has nobody spoken to anyone at in three weeks? `/stale`
+2. Who do we already know at this company, and who introduced us? `/intro-paths`
+3. Which referrers send us deals that reach diligence, and which never do? `/sources`
+4. Which NDAs lapse in the next 30 days? `/ndas`
+5. What did the committee ask for last time, and is it answered? `/ic-queue`
+6. Which portfolio companies are late with their figures? `/kpis-due`
+7. Which committed investors are relying on a certificate older than two years? `/certificates`
+8. Is any open deal on a listed company missing from the restricted list? `/compliance`
+9. Why did we pass on this founder last time? `/passes`
+10. How much is soft and how much is committed, per currency, for Fund II? `/fundraise`
+
+These are working commands on the demo data, not claims about what Affinity can or cannot report.
 
 ## Why no front end
 
@@ -63,7 +78,11 @@ npm install
 npm run demo
 ```
 
-Then open the folder in Claude Code and type a slash command. <!-- TODO(author): name the first command to try. -->
+Then open the folder in Claude Code and type `/weekly-review`: the Monday pipeline meeting in one answer. Or ask in plain words: "which deals have gone quiet?"
+
+The demo is a fictional NZ and AU seed fund with eight deals, two portfolio companies and four investors. It is deliberately untidy: a deal gone quiet for a month, an overdue next step, an NDA about to lapse, a listed target missing from the restricted list, a late portfolio report and an expired investor certificate. Dates move with today.
+
+`npm test` runs every command against a temporary database and must print PASS. `npm run view` writes the read-only pages to `views/`; `npm run docs` writes committee memos, investor statements and portfolio reports to `docs-out/`.
 
 ### Use it with your own Postgres or Supabase
 
@@ -71,15 +90,83 @@ Copy `.env.example` to `.env`, set `DATABASE_URL`, then `npm run migrate`. Same 
 
 ## The commands
 
-<!-- TODO(author): a table of the slash commands in .claude/commands and what each one does. -->
+Every command runs `npm run deals -- <command>`, takes `--json`, and matches deals, companies and people by full name, part of a name or the start of an id. An ambiguous name lists the candidates and stops. Every change needs `--actor` and lands in the activity log with what it was before.
 
 | Command | What it does |
 |---|---|
-| `/...` | ... |
+| `/help` | List every CLI command. |
+| `/list` | List every deal with its company, stage, owner and pipeline. |
+| `/show` | Everything on one deal: the record, every touch with anyone at the company, NDAs, committee decisions and follow-ups. |
+| `/pipeline` | The open pipeline in stage order, with days in stage, days since anyone last spoke to the company, and the next step. |
+| `/stale` | Open deals nobody has touched in more than 21 days, or ever. |
+| `/next-steps` | Next steps due in the next seven days, overdue first. |
+| `/intro-paths` | Warm paths into a company: who we know there, who on the team last spoke to them, and who introduced us. |
+| `/sources` | Where deals come from and how far each source's deals get: diligence, invested, passed. |
+| `/passes` | Every deal we passed on, with the reason and the date. |
+| `/ndas` | Every NDA with its status and expiry, flagged when it lapses within 30 days or a request has sat for 14 days. |
+| `/ic-queue` | Deals at investment committee or term sheet, with the last committee decision and its conditions. |
+| `/portfolio` | Each portfolio company: last figures received, when the next set is due, and whether it is late. |
+| `/kpis-due` | Portfolio companies whose reporting is overdue or who have never reported. |
+| `/fundraise` | Fund commitments by fund, currency and status (target, soft, committed, declined). |
+| `/certificates` | Investor certificates: type, date signed, the date the two-year reliance runs out, and the state. |
+| `/attention` | Everything that needs a person this week: quiet deals, overdue next steps and follow-ups, NDAs about to lapse, late portfolio reports, certificates about to run out. |
+| `/compliance` | Record checks against the rules in docs/compliance.md: investor certificates, the restricted list for listed companies, NDAs before diligence, committee records, and privacy reviews. |
+| `/activity` | The last 100 changes: who changed what, with the evidence they gave. |
+| `/weekly-review` | The Monday pipeline meeting in one run: pipeline, attention, next steps and the fundraise. |
+| `/add` | Add a deal against a company already on file. |
+| `/add-org` | Add a company: a target, portfolio company, investor, adviser or other. |
+| `/add-person` | Add a person, optionally at a company. |
+| `/update` | Change a deal's owner, amounts, currency, next step, close date or restricted-list flag. |
+| `/move` | Move a deal to another stage: sourced, first meeting, diligence, ic, term sheet, closed. |
+| `/pass` | Pass on a deal, with the reason. |
+| `/log` | Record a meeting, call, email, note or introduction against a deal, company or person. |
+| `/follow-up` | Set a dated follow-up on a deal or company. |
+| `/resolve` | Close a follow-up with the evidence that it is done. |
+| `/nda` | Record an NDA: requested, signed, returned or expired. |
+| `/ic` | Record an investment committee decision: invest, decline or more information. |
+| `/kpi` | Record a figure a portfolio company reported. |
+| `/commit` | Record or change an investor's commitment to a fund, and their certificate. |
+| `/import` | Bring an Affinity list export across: organizations, people, then opportunities. |
+| `/export` | Write every table to JSON files in exports/. |
+| `/draft-ic-memo` | Draft an investment committee memo for one deal into drafts/. |
+| `/draft-investor-update` | Draft the quarterly investor update for a fund into drafts/. |
+| `/draft-follow-up` | Draft a short follow-up email to the founder on a deal into drafts/. |
+| `/docs` | Committee memos, investor statements and portfolio reports in your brand. |
+| `/view` | Read-only pages: the Monday meeting, portfolio, fundraise, record checks. |
+| `/customise` | Add a field, rename a stage or change a rule in plain words: migration written, applied and tested. |
+| `/new-view` | Add a read-only page from a description. |
 
-## Instead of affinity
+### Your first hour: ten things to ask for
 
-<!-- TODO(author): how to bring data across from Affinity; link docs/replace-affinity.md -->
+1. "Put our fund name and logo on the committee memo." (brand.json)
+2. "Do a test import of our Affinity opportunities list without saving it."
+3. "Our Affinity statuses are Inbound, Partner Review, DD, IC, Closed and Pass. Map them."
+4. "Which deals have gone quiet, and who owns them?"
+5. "Who do we know at Tidewater, and who introduced us?"
+6. "Add a field for the lead investor on each deal." (/customise)
+7. "Rename the stages to match ours." (/customise)
+8. "Draft the committee memo for Ferncliff."
+9. "Which investors need a new certificate before the next close?"
+10. "Write the Monday review and save it to drafts."
+
+## Instead of Affinity
+
+Affinity exports each list (organizations, people, opportunities) as a CSV from the list view. Bring them across in that order:
+
+```bash
+npm run deals -- import affinity --list=organizations --file=imports/organizations.csv --actor="Your name" --dry-run
+npm run deals -- import affinity --list=organizations --file=imports/organizations.csv --actor="Your name"
+npm run deals -- import affinity --list=people --file=imports/people.csv --actor="Your name"
+npm run deals -- import affinity --list=opportunities --file=imports/opportunities.csv --map=imports/map.json --actor="Your name"
+```
+
+The whole file is checked before anything is saved; one bad row saves nothing. Every original column is kept on the record. Running the same file twice changes nothing; a changed row needs `--update`. Notes, the activity timeline, attachments and relationship scores do not come across in a list export: [what maps and what does not](docs/replace-affinity.md).
+
+## Compliance, documents and views
+
+`/compliance` checks the records against the rules a NZ or AU deal team works under: wholesale and eligible investor certificates (FMC Act Schedule 1), sophisticated investor accountant certificates (Corporations Act s708(8)(c)), a restricted list for deals on listed companies, NDAs before diligence, a committee decision before a term sheet, and privacy retention reviews (NZ IPP 9, AU APP 11.2). Each rule and its source: [docs/compliance.md](docs/compliance.md). It is a record check, not legal advice.
+
+Verification: CI runs `npm test` on Node 20 and 22 on Linux and Windows, plus a job against PostgreSQL 17. `TEST_DATABASE_URL` must name an empty, disposable database. [Why this target was chosen](docs/research.md).
 
 ## Architecture
 

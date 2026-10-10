@@ -13,6 +13,7 @@ That layer used to be the whole product, because talking to a database was hard.
 
 ## What you give up
 
+- **Automatic capture from your inbox.** Affinity reads your email and calendar to build relationship history and scores. Here, touches are logged by people (or by a connection Enterprise DNA builds for you).
 - **A visual board.** Stages are a table you ask about, not cards you drag.
 - **A phone app.** It runs where Claude Code runs.
 - **A vendor help desk.** This is open source. Enterprise DNA supports the installed version for businesses that want someone to call.

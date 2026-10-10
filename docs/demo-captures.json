@@ -1,0 +1,24 @@
+{
+  "captured": "2026-10-10T11:26:05.670Z",
+  "data": "Fictional seeded demo",
+  "screens": [
+    {
+      "title": "Deals gone quiet",
+      "ask": "Which open deals has nobody spoken to anyone at in the last three weeks?",
+      "command": "npm run deals -- stale",
+      "output": "  deal                      company               stage          owner  last_touch  days_quiet\n  ------------------------  --------------------  -------------  -----  ----------  ----------\n  Brightline Series A       Brightline Logistics  sourced        Aroha  2022-09-01  1500\n  Kowhai Robotics Series A  Kowhai Robotics       first meeting  Ben    2026-09-10  30"
+    },
+    {
+      "title": "A warm way in",
+      "ask": "Who do we know at Tidewater Analytics, and who introduced us?",
+      "command": "npm run deals -- intro-paths --ref=\"Tidewater Seed\"",
+      "output": "  deal            company              person     title            last_spoke_with_us  last_touch  introduced_by\n  --------------  -------------------  ---------  ---------------  ------------------  ----------  -------------\n  Tidewater Seed  Tidewater Analytics  Mere Tane  Founder and CEO  Aroha               2026-10-07  Priya Raman"
+    },
+    {
+      "title": "Investor certificates",
+      "ask": "Which investors in Fund II need a new certificate before the next close?",
+      "command": "npm run deals -- certificates",
+      "output": "  investor                 country  fund     status     certificate         certificate_on  relied_on_until  certificate_state\n  -----------------------  -------  -------  ---------  ------------------  --------------  ---------------  ----------------------\n  Hilltop Angels Trust     NZ       Fund II  committed  none                                                 no certificate\n  Ironbark Capital         AU       Fund II  target     none                                                 no certificate\n  Waitakere Family Office  NZ       Fund II  committed  nz-safe-harbour     2024-09-20      2026-09-20       expired\n  Coral Bay Super Fund     AU       Fund II  soft       au-s708-accountant  2024-11-09      2026-11-09       expires within 60 days"
+    }
+  ]
+}

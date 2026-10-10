@@ -1,14 +1,35 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Deal Flow for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Monday pipeline meeting",
+    "subtitle": "Open deals, what has gone quiet and what is due this week",
     "sections": [
-      {
-        "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
-      }
+      { "title": "Needs attention", "sql": "select item, issue, detail from v_attention order by issue, item" },
+      { "title": "Open pipeline", "sql": "select deal, company, stage, owner, days_in_stage, days_quiet, next_step, next_step_due from v_pipeline order by array_position(array['sourced','first meeting','diligence','ic','term sheet'], stage), days_in_stage desc" },
+      { "title": "Due in the next seven days", "sql": "select deal, owner, next_step, next_step_due from v_pipeline where next_step_due <= current_date + 7 order by next_step_due" }
+    ]
+  },
+  {
+    "name": "portfolio",
+    "title": "Portfolio reporting",
+    "sections": [
+      { "title": "Who has reported", "sql": "select company, owner, last_period, last_received, next_due, reporting from v_portfolio order by next_due nulls first" }
+    ]
+  },
+  {
+    "name": "fundraise",
+    "title": "Fundraise",
+    "sections": [
+      { "title": "Commitments by status", "note": "Each currency is its own line. Nothing is converted.", "sql": "select fund, currency, status, investors, amount from v_fundraise order by fund, currency, status" },
+      { "title": "Investor certificates", "sql": "select investor, fund, status, certificate, certificate_on, relied_on_until, certificate_state from v_certificates order by relied_on_until nulls first" }
+    ]
+  },
+  {
+    "name": "controls",
+    "title": "Record checks",
+    "sections": [
+      { "title": "Findings", "note": "Record checks against the rules in docs/compliance.md. Not legal advice.", "sql": "select rule, item, finding from v_compliance order by rule, item" },
+      { "title": "Where deals come from", "sql": "select * from v_sources order by invested desc, reached_diligence desc" }
     ]
   }
 ]

@@ -1,0 +1,42 @@
+[
+  {
+    "question": "Which open deals has nobody spoken to anyone at in three weeks?",
+    "command": "npm run deals -- stale"
+  },
+  {
+    "question": "Who do we already know at this company, and who introduced us?",
+    "command": "npm run deals -- intro-paths --ref=\"Deal\""
+  },
+  {
+    "question": "Which referrers send us deals that reach diligence, and which never do?",
+    "command": "npm run deals -- sources"
+  },
+  {
+    "question": "Which NDAs lapse in the next 30 days?",
+    "command": "npm run deals -- ndas"
+  },
+  {
+    "question": "What did the committee ask for last time?",
+    "command": "npm run deals -- ic-queue"
+  },
+  {
+    "question": "Which portfolio companies are late with their figures?",
+    "command": "npm run deals -- kpis-due"
+  },
+  {
+    "question": "Which committed investors are relying on a certificate older than two years?",
+    "command": "npm run deals -- certificates"
+  },
+  {
+    "question": "Is any open deal on a listed company missing from the restricted list?",
+    "command": "npm run deals -- compliance"
+  },
+  {
+    "question": "Why did we pass on this founder last time?",
+    "command": "npm run deals -- passes"
+  },
+  {
+    "question": "How much is soft and how much is committed, per currency, for each fund?",
+    "command": "npm run deals -- fundraise"
+  }
+]
